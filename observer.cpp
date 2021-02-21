@@ -1,0 +1,109 @@
+//------------------------------------------------------------------------
+#include "observer.hpp"
+//------------------------------------------------------------------------
+double
+Observer::gas_kinetic_energy(Variables *vars) {
+	double k = 0;
+	for (auto &a : vars->gases) {
+		k += a.px * a.px * a.mass;
+		k += a.py * a.py * a.mass;
+		k += a.pz * a.pz * a.mass;
+	}
+	return k *0.5 * real_to_kcalmol;
+};
+
+double 
+Observer::gas_temperature(Variables *vars) {
+	const int pn=vars->gases.size();
+	return gas_kinetic_energy(vars) / 1.5 * kb_real_inv/ static_cast<double>(pn);
+}
+
+double
+Observer::gas_total_kinetic_energy(Variables *vars, int num_gas) {
+	Gas *gases = vars->gases.data();
+	const int gs=vars->gases.size();
+	double k = 0;
+	double px,py,pz;
+	double mass=0;
+	for(int i=0;i<num_gas;i++) mass+=gases[i].mass/(double(num_gas));
+	for (int i=0;i<gs;i+=num_gas){
+		for(int j=0;j<num_gas;j++){
+			px=gases[i+j].px/(double(num_gas));
+			py=gases[i+j].py/(double(num_gas));
+			pz=gases[i+j].pz/(double(num_gas));
+		}
+		k += px * px * mass;
+		k += py * py * mass;
+		k += pz * pz * mass;
+	}
+	k /= vars->gases.size()/(double(num_gas));
+	return k *0.5 * real_to_kcalmol;
+};
+double
+Observer::ion_kinetic_energy(Variables *vars) {
+	double k = 0;
+	for (auto &a : vars->ions) {
+		k += a.px * a.px * a.mass;
+		k += a.py * a.py * a.mass;
+		k += a.pz * a.pz * a.mass;
+	}
+	return k *0.5 * real_to_kcalmol;
+};
+
+double
+Observer::ion_temperature(Variables *vars) {
+	const int pn=vars->ions.size();
+	return ion_kinetic_energy(vars) / 1.5 * kb_real_inv/ static_cast<double>(pn);
+};
+
+//------------------------------------------------------------------------
+double
+Observer::potential_energy(Variables *vars, std::vector<Pair> &pairs) {
+  /*double v = 0.0;
+  const int pp = pairs.size();
+  const int pn = vars->gases.size();
+  Gas *gases = vars->gases.data();
+  for(int k=0;k<pp;k++){
+    const int i = pairs[k].i;
+    const int j = pairs[k].j;
+    double dx = gases[j].qx - gases[i].qx;
+    double dy = gases[j].qy - gases[i].qy;
+    double dz = gases[j].qz - gases[i].qz;
+    adjust_periodic(dx, dy, dz);
+    double r2 = (dx * dx + dy * dy + dz * dz);
+	double r2inv=1/r2;
+		int type1=gases[i].type;
+		int type2=gases[j].type;
+		if (r2 < CL2){
+			double r6inv = r2inv * r2inv * r2inv;
+			v += r6inv * (vars->pair_coeff[type1][type2][0] * r6inv - vars->pair_coeff[type1][type2][1]);	
+		}
+   }
+  v /= static_cast<double>(pn);*/
+  return 0;
+}
+//------------------------------------------------------------------------
+double
+Observer::pressure(Variables *vars, std::vector<Pair> &pairs, double Treal, double virial) {
+	double phi = 0.0;
+	/*const int ps = pairs.size();
+	Gas *gases = vars->gases.data();
+	for (int k = 0; k < ps; k++) {
+		const int i = pairs[k].i;
+		const int j = pairs[k].j;
+		double dx = gases[j].qx - gases[i].qx;
+		double dy = gases[j].qy - gases[i].qy;
+		double dz = gases[j].qz - gases[i].qz;
+		adjust_periodic(dx, dy, dz);
+		double r2 = (dx * dx + dy * dy + dz * dz);
+		double r2inv= 1/r2;
+		int type1=gases[i].type;
+		int type2=gases[j].type;
+		if (r2 < CL2){
+			double r6inv = r2inv * r2inv * r2inv;
+			phi += r6inv * (vars->pair_coeff[type1][type2][0] * r6inv - vars->pair_coeff[type1][type2][1]);	
+		}
+	}*/
+	phi = phi * Cpress;
+	return  p/T*Treal + phi;
+}

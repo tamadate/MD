@@ -1,0 +1,61 @@
+
+Gas type
+4
+
+Temperature
+300
+
+Pressure
+100000
+
+Time step
+1
+
+Total number of steps
+1000000000
+
+Number of steps for relax
+1
+
+Number of steps for repre
+1
+
+Number of around gas
+1000
+
+Cut off length
+15
+
+Margin size
+10
+
+Diffusion coefficient in Ar
+4.0e-6
+
+Diffusion coefficient in N2
+3.985e-6
+
+gas gas interaction
+OFF
+
+gas ion interaction
+LJ
+
+ion ion interaction
+coul
+
+Nose-Hoover ion
+300
+
+Nose-Hoover gas
+OFF
+
+Gyration path
+gyration
+
+Output
+Ar+
+
+Coarse grain
+1	0
+
