@@ -21,8 +21,10 @@ C++ compiler, C++11
   
 **Step3 Run the simulation**
 
-* Collision simulation              : ./a.out in1 con1 in2 con2 del_coeff L N
-* Diffusion coefficient calculation : ./a.out in1 con1 L N
+* Collision simulation              
+$ ./a.out in1 con1 in2 con2 del_coeff L N
+* Diffusion coefficient calculation 
+$ ./a.out in1 con1 L N
 
 **Step4 Analyze the output files**
   
