@@ -11,8 +11,6 @@ C++ compiler, C++11
 # How to use?
 **Step1 Compile**
 
-  If you use g++ compiler, just comple the codes by
-
   g++ -o a.out *cpp -std=c++11
 
 **Step2 Set parameters**
