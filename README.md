@@ -10,8 +10,7 @@ C++ compiler, C++11
 
 # How to use?
 **<Step1 Compile>**
-
-  g++ -o a.out *cpp -std=c++11
+'''$ g++ -o a.out *cpp -std=c++11'''
 
 **<Step2 Set parameters>**
 
@@ -22,9 +21,9 @@ C++ compiler, C++11
 **Step3 Run the simulation**
 
 * Collision simulation              
-1. $ ./a.out in1 con1 in2 con2 del_coeff L N
+'''$ ./a.out in1 con1 in2 con2 del_coeff L N'''
 * Diffusion coefficient calculation 
-2. $ ./a.out in1 con1 L N
+'''$ ./a.out in1 con1 L N'''
 
 **Step4 Analyze the output files**
   
