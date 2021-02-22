@@ -28,5 +28,5 @@ C++ compiler, C++11
 
 **Step4 Analyze the output files**
   
-#References
+# References
 DOI: 10.1063/1.5144772 (JCP), DOI: 10.1039/d0cp03989f (PCCP)
