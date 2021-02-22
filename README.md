@@ -20,7 +20,7 @@ $ g++ -o a.out *cpp -std=c++11
 * Diffusion coefficient calculation: Make 2 files and set 2 calculation prperties -> input file 1 (in1), calculation condition file 1 (con1), collision distance (L) and calculation number (N)
   
   
-**Step3 Run the simulation**
+## Step3 Run the simulation
 
 * Collision simulation              
 ~~~
@@ -31,7 +31,11 @@ $ ./a.out in1 con1 in2 con2 del_coeff L N
 $ ./a.out in1 con1 L N
 ~~~
 
-**Step4 Analyze the output files**
+## Step4 Analyze the output files
   
+# Authours
+Tomoya Tamadate
+https://www.researchgate.net/profile/Tomoya_Tamadate
+
 # References
 DOI: 10.1063/1.5144772 (JCP), DOI: 10.1039/d0cp03989f (PCCP)
