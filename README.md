@@ -1,12 +1,8 @@
-# MD
-This code is applycable to analyze the collision process (ion-ion/ion-particle/particle-particle) and transportation.
-
-
+# MD_Collision_Transportation
+This code is applycable to analyze the collision process (ion-ion/ion-particle/particle-particle) and transportation in gas phase.
 
 # Requirement
 C++ compiler, C++11
-
-
 
 # How to use?
 ## Step1 Compile
@@ -40,4 +36,5 @@ $ ./a.out in1 con1 L N
 * https://www.researchgate.net/profile/Tomoya_Tamadate
 
 # References
-DOI: 10.1063/1.5144772 (JCP), DOI: 10.1039/d0cp03989f (PCCP)
+* DOI: 10.1063/1.5144772 
+* DOI: 10.1039/d0cp03989f 
