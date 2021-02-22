@@ -11,20 +11,20 @@ C++ compiler, C++11
 # How to use?
 **Step1 Compile**
 
-  If you use g++ compiler, you can compile the source code by
+  If you use g++ compiler, just comple the codes by
 
   g++ -o a.out *cpp -std=c++11
 
 
 **Step2 Set parameters**
 
-  in1:  input file 1
-  con1: calculation condition 1
-  in2:  input file 2
-  con2: calculation condition 2
-  del_coeff:  Coefficient of Limiting sphere (see our JCP paper)
-  L:    Collision distance
-  N:    Calculation number
+  _in1_:  input file 1
+  _con1_: calculation condition 1
+  _in2_:  input file 2
+  _con2_: calculation condition 2
+  _del_coeff_:  Coefficient of Limiting sphere (see our JCP paper)
+  _L_:    Collision distance
+  _N_:    Calculation number
   
   
 **Step3 Run the simulation**
