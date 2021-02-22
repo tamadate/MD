@@ -34,8 +34,10 @@ $ ./a.out in1 con1 L N
 ## Step4 Analyze the output files
   
 # Authours
-Tomoya Tamadate
+Tomoya Tamadate  
+Research gate~
 https://www.researchgate.net/profile/Tomoya_Tamadate
+~
 
 # References
 DOI: 10.1063/1.5144772 (JCP), DOI: 10.1039/d0cp03989f (PCCP)
