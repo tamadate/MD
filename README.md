@@ -6,13 +6,16 @@ C++ compiler, C++11
 
 # How to use?
 ## Step1 Compile
+On your download directory,
 ~~~
 $ g++ -o a.out *cpp -std=c++11
 ~~~
+We have tested g++ and icpc compilers.
 
 ## Step2 Set parameters
 
-* Collision simulation: Make 4 files and set 3 calculation prperties -> input file 1 (in1), inpute file 2 (in2), calculation condition file 1 (con1), calculation condition file 2 (con2), Coefficient of limiting sphere radius (del_coeff), collision distance (L) and calculation number (N)
+* Collision simulation 
+  Make 4 files and set 3 calculation prperties -> input file 1 (in1), inpute file 2 (in2), calculation condition file 1 (con1), calculation condition file 2 (con2), Coefficient of limiting sphere radius (del_coeff), collision distance (L) and calculation number (N)
 * Diffusion coefficient calculation: Make 2 files and set 2 calculation prperties -> input file 1 (in1), calculation condition file 1 (con1), collision distance (L) and calculation number (N)
   
   
