@@ -10,7 +10,7 @@ C++ compiler, C++11
 
 # How to use?
 **<Step1 Compile>**
-~~~$ g++ -o a.out *cpp -std=c++11~~~
+~~~ $ g++ -o a.out *cpp -std=c++11 ~~~
 
 **<Step2 Set parameters>**
 
