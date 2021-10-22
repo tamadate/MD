@@ -14,7 +14,8 @@ class MD {
 	private:
 
 
-	public:
+    public:
+        double kappaIonDipole;
 		Variables *vars;
 		Observer *obs;
 		Physical *pp;
@@ -27,8 +28,9 @@ class MD {
 		std::vector<int> gas_out;	/*	gas list far from ion1	*/
 		std::vector<Pair> pairs;	/*	pair list	*/
 		std::vector<Pair> pairs_tersoff;	/*	pair list	*/
-		std::vector<Pair> pairs_gi;	/*	pair list	*/
-		std::vector<Pair> pairs_gg;	/*	pair list	*/
+		std::vector<Pair> pairs_gi;	/*	gas-ion interaction pair list	*/
+		std::vector<Pair> pairs_gg;	/*	gas-gas interaction pair list	*/
+        std::vector<Pair> pairs_vi;	/*	vapor-ion interaction pair list	*/
 		double margin_length;	
 
 	//	velocity verlet
@@ -36,10 +38,17 @@ class MD {
 		void run_recomb_pre(void);
 		void run_recomb_repre(void);
 		void verlet(void);
+        void v_verlet(void);
+        void v_verlet_eq(void);
 		int verlet_recomb(MD *md2);	
 		int verlet_recomb_after(MD *md2);	
 		void update_position(void);		
+        void update_position_v(void);		
+        void update_position_constrained(void);		
 		void velocity_calculation(void);
+        void velocity_calculation_v(void);
+        void velocity_calculation_veq(void);
+        void update_velocity_constrained(void);
 
 
 	//	pair list
@@ -47,9 +56,12 @@ class MD {
 		void make_pair_gasgas(void);
 		void make_pair_gasion(void);
 		void check_pairlist(void);
+        void makeDiatomicProp_in(int i);
+        void makeDiatomicProp_out(int i);
 
 	//	initialization
-		void initialization_gas(Variables *vars);
+		void initialization_gas(void);
+        void initialization_vapor(void);
 		void reinitialization(void);
 		int initial_recomb(MD *md2, MD *Md1, MD *Md2, Physical *pp12);
 
@@ -64,16 +76,20 @@ class MD {
 		void compute_lj_coul(void);
 		void compute_lj(void);
 		void compute_ion_dipole(void);
+        void compute_ion_dipole2(void);
+        void compute_ion_dipole3(void);
+        void compute_ion_dipole4(void);
 		void compute_coul(void);
 		void compute_domdom_lj_coul(MD *md2);
 		void compute_domdom_lj(MD *md2);
 		void compute_gasgas_lj(void);
 		void compute_cg(void);
+        void computeN2(void);
 
 	//	periodic
 		void periodic(void);	/*	periodic condition for gas_in	*/
-		void periodic_out(int dist, std::vector<int> &gas);	/*	periodic condition for gas_out	*/
-		void periodic_semi(void);
+		void boundary_scaling_gas_move(int i);
+		void boundary_scaling_ion_move(int i);
 		int number;	/*	number of used distribution in fvlist	*/
 		int number_N2;
 		std::vector<double> vflux;	/*	seed of vf(v)/c	*/

@@ -23,12 +23,10 @@ MD::verlet(void) {
 	analysis_ion();
 	if(flags->fix_cell_center==1) fix_cell_center(); // off
 	if(flags->velocity_scaling==1)	velocity_scaling();
-
+    
 	update_position();	
 	if(flags->nose_hoover_ion==1)	nosehoover_zeta();
 	if(flags->nose_hoover_gas==1)	nosehoover_zeta_gas();
-	if(flags->semi_NVT_gasgas==0)	periodic();
-	if(flags->semi_NVT_gasgas==1)	periodic_semi();
 	check_pairlist();
 	compute_intra();
 	compute_inter();
@@ -39,6 +37,7 @@ MD::verlet(void) {
 }
 
 
+
 /////////////////////////////////////////////////////////////////////
 /*	
 	- Update velocity (half of a time step, dt/2)
@@ -47,19 +46,16 @@ MD::verlet(void) {
 void 
 MD::velocity_calculation(void) {
 	Gas *gases = vars->gases.data();
-	int gis=gas_in.size();
 	double const Coeff=dt / 2.0 * 4.184 * 1e-4;
 	for (auto &a : vars->ions) {
 		a.px += a.fx / a.mass *Coeff;
 	    a.py += a.fy / a.mass *Coeff;
 	    a.pz += a.fz / a.mass *Coeff;
 	}
-	for (int k=0;k<gis;k++){
-		for(int i = gas_in[k]; i < gas_in[k]+pp->num_gas; i++){
-			gases[i].px += gases[i].fx / gases[i].mass *Coeff;
-			gases[i].py += gases[i].fy / gases[i].mass *Coeff;
-			gases[i].pz += gases[i].fz / gases[i].mass *Coeff;
-		}
+    for (auto &i : gas_in){
+        gases[i].px += gases[i].fx / gases[i].mass *Coeff;
+        gases[i].py += gases[i].fy / gases[i].mass *Coeff;
+        gases[i].pz += gases[i].fz / gases[i].mass *Coeff;
 	}
 }
 
@@ -71,22 +67,20 @@ MD::velocity_calculation(void) {
 void
 MD::update_position(void) {
 	Gas *gases = vars->gases.data();
-	int gis=gas_in.size();
 	for (auto &a : vars->ions) {
 		a.qx += a.px * dt;
 		a.qy += a.py * dt;
 		a.qz += a.pz * dt;
 		a.fx=a.fy=a.fz=0.0;
 	}
-	for (int k=0;k<gis;k++){
-		for(int i = gas_in[k]; i < gas_in[k]+pp->num_gas; i++){
-			gases[i].qx += gases[i].px * dt;
-			gases[i].qy += gases[i].py * dt;
-			gases[i].qz += gases[i].pz * dt;
-			gases[i].fx=gases[i].fy=gases[i].fz=0.0;
-		}
-	}
+    for (auto &i : gas_in) {
+        gases[i].qx += gases[i].px * dt;
+        gases[i].qy += gases[i].py * dt;
+        gases[i].qz += gases[i].pz * dt;
+        gases[i].fx=gases[i].fy=gases[i].fz=0.0;    
+    }
 }
+
 
 /////////////////////////////////////////////////////////////////////
 /*	
@@ -101,4 +95,3 @@ MD::fix_cell_center(void) {
 		a.pz -= ion_v[2];
 	}
 }
-

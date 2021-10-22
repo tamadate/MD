@@ -19,7 +19,7 @@ void
 MD::nosehoover_zeta(void){
 	double Tnow=obs->ion_temperature(vars);
 	int g=vars->ions.size()*3;
-	double Q_inv = 0.001;
+	double Q_inv = 0.0001;
 	vars->zeta_ion += (Tnow - pp->Tnh_ion)*g*kb_real*Q_inv*dt;
 }
 
@@ -37,7 +37,7 @@ MD::nosehoover_ion(void){
 void
 MD::nosehoover_zeta_gas(void){
 	double Tnow=obs->gas_temperature(vars);
-	int g=vars->gases.size()*3;
+	int g=Nof_around_gas*3;
 	double Q_inv = 0.001;
 	vars->zeta_gas += (Tnow - pp->Tnh_gas)*g*kb_real*Q_inv*dt;
 }

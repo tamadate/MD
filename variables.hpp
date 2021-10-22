@@ -53,6 +53,17 @@ struct Gas {
 	int ix, iy, iz;
 };
 //------------------------------------------------------------------------
+struct Atom {
+ 	double qx, qy, qz;
+	double px, py, pz;
+	double charge;
+	int type;
+	int id;
+	double fx, fy, fz;
+	double mass;
+	int ix, iy, iz;
+};
+//------------------------------------------------------------------------
 struct Bond {
 	int atom1, atom2, type;
 };
@@ -86,11 +97,13 @@ public:
 	/*variables*/
 	std::vector<Ion> ions;
 	std::vector<Gas> gases;
+    std::vector<Atom> vapors;
 	double time;
 	double zeta_ion;
 	double zeta_gas;
 
 	/*vectors for potential calculation*/
+    std::vector<Pair> ion_pairs;
 	std::vector<Bond> bonds;
 	std::vector<Angle> angles;
 	std::vector<Dihedral> dihedrals;
@@ -104,6 +117,7 @@ public:
 	/*add to vectors*/
 	void add_ions(int id, int type, double x, double y, double z, double vx, double vy, double vz, double fx, double fy, double fz, double charge, double mass);
 	void add_gases(int id, int type, double x, double y, double z, double vx, double vy, double vz, double fx, double fy, double fz, double charge, double mass);
+    void add_vapors(int id, int type, double x, double y, double z, double vx, double vy, double vz, double fx, double fy, double fz, double charge, double mass);
 	void add_bonds(int atom1, int atom2, int type);
 	void add_angles(int atom1, int atom2, int atom3, int type);
 	void add_dihedrals(int atom1, int atom2, int atom3, int atom4, int type);

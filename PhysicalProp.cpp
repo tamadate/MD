@@ -97,7 +97,7 @@ Physical::read(char* infile){
 		if (iflag==2) {
 			int loop=0;
 			int type, id;
-			double charge, x, y, mass;
+			double charge, mass;
 			while(getline(stream,tmp,'\t')) {
 				if (loop==1) type=stoi(tmp);
 				if (loop==2) charge=stod(tmp);
@@ -247,11 +247,18 @@ Physical::set_condition(char* condfile, FLAG *flags){
 			else printf("**************Uknown gas gas parameter was found**************\n");
 		}
 		if (iflag==19) {
-			if (str=="LJ") flags->force_lj=1;
-			else if (str=="ion dipole") flags->force_ion_dipole=1;
+			if (str=="LJ") {
+                flags->force_lj=1;
+                cout<<"ion-gas interaction -->\tLJ Coul"<<endl;
+            }
+			else if (str=="ion dipole") {
+                flags->force_ion_dipole=1;
+                cout<<"ion-gas interaction -->\tLJ Coul"<<endl;
+            }
 			else if (str=="OFF") {
 				flags->force_ion_dipole=0;
 				flags->force_lj=0;
+                cout<<"ion-gas interaction -->\tOFF"<<endl;
 			}
 			else printf("**************Uknown gas ion parameter was found**************\n");
 		}
@@ -264,11 +271,14 @@ Physical::set_condition(char* condfile, FLAG *flags){
 		}
 		if (iflag==21) {
 			if (str=="OFF") {flags->nose_hoover_ion=0; cout<<"Nose-Hoover for ion --> OFF"<<endl;}
-			else {
-				flags->nose_hoover_ion=1;
-				Tnh_ion=stod(str);
-				cout<<"Nose-Hoover for ion --> ON --> "<<Tnh_ion<<" K"<<endl;
-			}
+            else{
+                if(str=="scale") {flags->nose_hoover_ion=0;flags->velocity_scaling=1; cout<<"Nose-Hoover for ion --> OFF\nVelocity scaling for ion --> ON"<<endl;}
+                else {
+                    flags->nose_hoover_ion=1;
+                    Tnh_ion=stod(str);
+                    cout<<"Nose-Hoover for ion --> ON --> "<<Tnh_ion<<" K"<<endl;
+                }
+            }
 		}
 		if (iflag==22) {
 			if (str=="OFF") {flags->nose_hoover_gas=0; cout<<"Nose-Hoover for gas --> OFF"<<endl;}

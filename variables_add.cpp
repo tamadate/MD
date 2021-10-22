@@ -35,6 +35,16 @@ Variables::add_dtype(int type, int multi, double coeff1, double coeff2, double c
 	dit.coeff3 = coeff3;
 	dit.coeff4 = coeff4;
 	dit.coeff5 = coeff5;
+    dit.coeff6 = coeff6;
+    dit.coeff7 = coeff7;
+    dit.coeff8 = coeff8;
+    dit.coeff9 = coeff9;
+    dit.coeff10 = coeff10;
+    dit.coeff11 = coeff11;
+    dit.coeff12 = coeff12;
+    dit.coeff13 = coeff13;
+    dit.coeff14 = coeff14;
+    dit.coeff15 = coeff15;
 	dtypes.push_back(dit);
 }
 void
@@ -78,6 +88,27 @@ Variables::add_gases(int id, int type, double x, double y, double z, double vx, 
 	a.iy=0;
 	a.iz=0;
 	gases.push_back(a);
+}
+void
+Variables::add_vapors(int id, int type, double x, double y, double z, double vx, double vy, double vz, double fx, double fy, double fz, double charge, double mass) {
+ 	Atom a;
+	a.id = id;
+	a.type = type; 
+	a.qx = x;
+	a.qy = y;
+	a.qz = z;
+	a.px = vx;
+	a.py = vy;
+	a.pz = vz;
+	a.mass = mass;
+	a.fx = fx;
+	a.fy = fy;
+	a.fz = fz;
+	a.charge = charge;
+	a.ix=0;
+	a.iy=0;
+	a.iz=0;
+	vapors.push_back(a);
 }
 void
 Variables::add_bonds(int atom1, int atom2, int type) {

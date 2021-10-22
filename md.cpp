@@ -18,12 +18,11 @@ MD::MD(char* condfile, char* file) {
 	pp->PhysicalProp_set(condfile, file, flags);
 	vars->read_initial(file);
 	vars->set_initial_velocity(pp);
-	initialization_gas(vars);
+	initialization_gas();
+    initialization_vapor();
 	analysis_ion();
 	make_pair();
 	margin_length = MARGIN;
-
-
 }
 
 /////////////////////////////////////////////////////////////////////

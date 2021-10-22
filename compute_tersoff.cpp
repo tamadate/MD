@@ -72,7 +72,7 @@ Tersoff::compute_tersoff(Variables *vars) {
 			energy+=bij(zeta_ij)*fC(r)*fA(r)*0.5;
 
 			if(zeta_ij==0) continue;
-			for (auto k : neighshort){
+			for (auto k : neighshort) {
 				if(k==j) continue;
 				delr2[0] = ions[i].qx - ions[k].qx;
 				delr2[1] = ions[i].qy - ions[k].qy;

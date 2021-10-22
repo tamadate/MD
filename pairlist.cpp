@@ -20,10 +20,10 @@ MD::make_pair(void){
 	Gas *gases = vars->gases.data();
 	double vmax2 = 0.0;
 	int gos=gas_out.size();
-	for (auto &a : vars->gases) {
-		double px=a.px;
-		double py=a.py;
-		double pz=a.pz;
+	for (auto &a : gas_out) {
+		double px=gases[a].px;
+		double py=gases[a].py;
+		double pz=gases[a].pz;
 		double v2 = px*px + py*py + pz*pz;
 		if (vmax2 < v2) vmax2 = v2;
 	}
@@ -50,9 +50,8 @@ MD::make_pair_gasion(void){
 	Gas *gases = vars->gases.data();
 	Ion *ions = vars->ions.data();
 	int is=vars->ions.size();
-	int gs=vars->gases.size();
 	if(flags->cg==0){
-		for (int i=0;i<gs;i++){
+		for (int i=0;i<Nof_around_gas;i++){
 			int flag_in=0;
 			for (int j=0;j<is;j++){
 				double dx = gases[i].qx - ions[j].qx;
@@ -60,23 +59,38 @@ MD::make_pair_gasion(void){
 				double dz = gases[i].qz - ions[j].qz;
 				double r2 = (dx * dx + dy * dy + dz * dz);
 				if (r2 < ML2){
-					flag_in++;
+					flag_in+=1;
 					Pair p;
 					p.i=i;
 					p.j=j;
 					pairs_gi.push_back(p);
+                    if(pp->num_gas==2) {
+                        p.i=i+Nof_around_gas;
+                        pairs_gi.push_back(p);
+                    }
 				}
 			}
 	//if inter-gas interaction flag is ON, stand flag_in ON
 	//if flag_in ON, molecule push back to gas_in
 	//if flag_in OFF, molecule push back to gas_out
 			if(flags->force_gasgas_lj==1) flag_in=1;	
-			if(flag_in>0) gas_in.push_back(i);
-			if(flag_in==0) gas_out.push_back(i);
+			if(flag_in>0) {
+                gas_in.push_back(i);
+                if(pp->num_gas==2) {
+                   makeDiatomicProp_in(i);
+                    gas_in.push_back(i+Nof_around_gas);
+                }
+            }
+			if(flag_in==0) {
+                gas_out.push_back(i);
+                if(pp->num_gas==2) {
+                    makeDiatomicProp_out(i);
+                }
+            }
 		}
 	}
 	if(flags->cg==1){
-		for (int i=0;i<gs;i++){
+		for (int i=0;i<Nof_around_gas;i++){
 			int flag_in=0;
 			double dx = gases[i].qx - ion_r[0];
 			double dy = gases[i].qy - ion_r[1];
@@ -125,31 +139,22 @@ MD::make_pair_gasgas(void){
 void
 MD::check_pairlist(void){
 	loop++;
+	Gas *gases = vars->gases.data();
 	if(loop>loop_update){
-		periodic_out(0,gas_out);
-		int gos=gas_out.size();
-		Gas *gases = vars->gases.data();
-		for (int k = 0; k < gos; k++) {
-			double dqx=0,dqy=0,dqz=0;
-			for(int i = gas_out[k]; i < gas_out[k]+pp->num_gas; i++){
-				dqx+=gases[i].px*gases[i].mass;
-				dqy+=gases[i].py*gases[i].mass;
-				dqz+=gases[i].pz*gases[i].mass;
-			}
-			dqx=dqx*dt*loop/pp->Mgas;
-			dqy=dqy*dt*loop/pp->Mgas;
-			dqz=dqz*dt*loop/pp->Mgas;
-			for(int i = gas_out[k]; i < gas_out[k]+pp->num_gas; i++){
-				gases[i].qx += dqx;
-				gases[i].qy += dqy;
-		  		gases[i].qz += dqz;
-			}
+		for (auto &a : gas_out) boundary_scaling_ion_move(a);
+		for (auto &i : gas_out) {
+            gases[i].qx += gases[i].px*dt*loop;
+            gases[i].qy += gases[i].py*dt*loop;
+            gases[i].qz += gases[i].pz*dt*loop;
 		}
-		periodic_out(1,gas_out);
+		for (auto &a : gas_out) boundary_scaling_gas_move(a);
 		make_pair();
 		for(int i=0;i<3;i++) pre_ion[i]=ion_r[i];
 	}
 	if(flags->force_sw==1) sw->check_pairlist(vars);
 	if(flags->force_ters==1) ters->check_pairlist(vars);
 }
+
+
+
 

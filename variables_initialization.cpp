@@ -64,30 +64,31 @@ Variables::read_initial(char* infile) {
 			double coeff1, coeff2, coeff3, coeff4, coeff5, coeff6, coeff7, coeff8, coeff9, coeff10,  coeff11, coeff12, coeff13, coeff14, coeff15;
 			while(getline(stream,tmp,'\t')) {
 				if (loop==0) type=stoi(tmp);
-				if (loop==2) multi=stod(tmp);
-				if (loop==2) coeff1=stod(tmp);
-				if (loop==3) coeff2=stod(tmp);
-				if (loop==4) {
+				if (loop==2) multi=stoi(tmp);
+				if (loop==3) coeff1=stod(tmp);
+				if (loop==4) coeff2=stod(tmp);
+				if (loop==5) {
 					coeff3=stod(tmp);
 					coeff4=cos(stod(tmp)/180.0*M_PI);
 					coeff5=sin(stod(tmp)/180.0*M_PI);
 				}
-				if (loop==5) coeff6=stod(tmp);
-				if (loop==6) coeff7=stod(tmp);
-				if (loop==7) {
+				if (loop==6) coeff6=stod(tmp);
+				if (loop==7) coeff7=stod(tmp);
+				if (loop==8) {
 					coeff8=stod(tmp);
 					coeff9=cos(stod(tmp)/180.0*M_PI);
 					coeff10=sin(stod(tmp)/180.0*M_PI);
 				}
-				if (loop==8) coeff11=stod(tmp);
-				if (loop==9) coeff12=stod(tmp);
-				if (loop==10) {
+				if (loop==9) coeff11=stod(tmp);
+				if (loop==10) coeff12=stod(tmp);
+				if (loop==11) {
 					coeff13=stod(tmp);
 					coeff14=cos(stod(tmp)/180.0*M_PI);
 					coeff15=sin(stod(tmp)/180.0*M_PI);
 				}
 				loop++;
 			}
+            cout<<multi<<" "<<coeff1<<" "<<coeff2<<" "<<coeff3<<" "<<coeff4<<" "<<coeff5<<" "<<coeff6<<" "<<coeff7<<" "<<coeff8<<" "<<coeff9<<" "<<coeff10<<" "<<coeff11<<" "<<coeff12<<" "<<coeff13<<" "<<coeff14<<" "<<coeff15<<endl;
 			add_dtype(type, multi, coeff1, coeff2, coeff3, coeff4, coeff5, coeff6, coeff7, coeff8, coeff9, coeff10, coeff11, coeff12, coeff13, coeff14, coeff15);
 		}
 		if (iflag==5) {
@@ -172,7 +173,30 @@ Variables::read_initial(char* infile) {
 	random_device seed;
 	double A,B,C,x,y,z;
 	A=seed(),B=seed(),C=seed();
-	//for(auto &a : ions) {x=a.qx,y=a.qy,z=a.qz; ROTATION(a.qx,a.qy,a.qz,A,B,C,x,y,z);}
+	for(auto &a : ions) {x=a.qx,y=a.qy,z=a.qz; ROTATION(a.qx,a.qy,a.qz,A,B,C,x,y,z);}
+    int is=ions.size();
+    for(int i=0;i<is-1;i++) {
+        for(int j=i+1;j<is;j++){
+            int flag=0;
+            for (auto &d : dihedrals) {
+                int I=d.atom1;
+                int J=d.atom2;
+                int K=d.atom3;
+                int L=d.atom4;
+                if(i==I){if(j==J||j==K||j==L) flag=1;}
+                if(i==J){if(j==I||j==K||j==L) flag=1;}
+                if(i==K){if(j==J||j==I||j==L) flag=1;}
+                if(i==L){if(j==J||j==K||j==I) flag=1;}
+            }
+            if (flag==0){
+                Pair p;
+                p.i=i;
+                p.j=j;
+                ion_pairs.push_back(p);
+            }
+        }
+    }
+    
 }
 
 //------------------------------------------------------------------------
@@ -180,10 +204,9 @@ void
 Variables::set_initial_velocity(Physical *pp) {
 	random_device seed;
 	default_random_engine engine(seed());
-	double msi=28.085/6.02e23/1000.0;
-	normal_distribution<> dist(0.0, sqrt(kb*T/msi));
-	mt19937 mt(seed());
-	for(auto &a : ions) {
+    for(auto &a : ions) {
+        double matom=a.mass/6.02e23/1000.0;
+        normal_distribution<> dist(0.0, sqrt(kb*T/matom));
 		a.px=dist(engine)*1e-5;
 		a.py=dist(engine)*1e-5;
 		a.pz=dist(engine)*1e-5;

@@ -8,7 +8,7 @@ public:
 	const double MN2=28.0, MHe=4.0026, MAr=39.948;
 	const double mN2=MN2/Nw/1000.0;
 	const double myuHe=1.47e-5, myuN2=1.7e-5, myuAr=2.28e-5;
-	const double alphaHe=0.208, alphaN2=1.7, alphaAr=1.664;
+	const double alphaHe=0.208, alphaN2=1.7*0.5, alphaAr=1.664;
 	double Mion, Mgas, mgas,m , m_gas, m_N2, z, myu, D, D0, ram, delta, alphagas,v0,th0,CD,D0_He,D0_Ar,D0_N2,zzee;
 	int num_gas;
 	double rm, b, bm, integral, guzai, ita, itafm, itac, cgas;

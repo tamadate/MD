@@ -24,6 +24,8 @@ extern int Nof_around_gas;
 extern double d_size;
 extern double V;
 
+const int Nof_vapor=100;
+
 
 //------------------------------------------------------------------------
 extern double dt;

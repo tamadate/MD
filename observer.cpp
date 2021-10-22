@@ -14,35 +14,24 @@ Observer::gas_kinetic_energy(Variables *vars) {
 
 double 
 Observer::gas_temperature(Variables *vars) {
-	const int pn=vars->gases.size();
-	return gas_kinetic_energy(vars) / 1.5 * kb_real_inv/ static_cast<double>(pn);
+	return gas_kinetic_energy(vars) / 1.5 * kb_real_inv/ double(Nof_around_gas);
 }
 
 double
-Observer::gas_total_kinetic_energy(Variables *vars, int num_gas) {
-	Gas *gases = vars->gases.data();
-	const int gs=vars->gases.size();
+Observer::gas_total_kinetic_energy(Variables *vars) {
 	double k = 0;
-	double px,py,pz;
-	double mass=0;
-	for(int i=0;i<num_gas;i++) mass+=gases[i].mass/(double(num_gas));
-	for (int i=0;i<gs;i+=num_gas){
-		for(int j=0;j<num_gas;j++){
-			px=gases[i+j].px/(double(num_gas));
-			py=gases[i+j].py/(double(num_gas));
-			pz=gases[i+j].pz/(double(num_gas));
-		}
-		k += px * px * mass;
-		k += py * py * mass;
-		k += pz * pz * mass;
+	for (auto &a : vars->gases) {
+		k += a.px * a.px * a.mass;
+		k += a.py * a.py * a.mass;
+		k += a.pz * a.pz * a.mass;
 	}
-	k /= vars->gases.size()/(double(num_gas));
 	return k *0.5 * real_to_kcalmol;
 };
 double
 Observer::ion_kinetic_energy(Variables *vars) {
 	double k = 0;
-	for (auto &a : vars->ions) {
+	
+   for (auto &a : vars->ions) {
 		k += a.px * a.px * a.mass;
 		k += a.py * a.py * a.mass;
 		k += a.pz * a.pz * a.mass;

@@ -37,7 +37,7 @@ MD::run_recomb_pre(void) {
 
 void 
 MD::run_recomb_repre(void) {
- 	const int OBSERVE = 100000;
+ 	const int OBSERVE = 10000000;
 	for (int it=0; it < pp->step_repre; it++) {
 		if (it%OBSERVE==0) {
 			display(1);
@@ -64,8 +64,9 @@ MD::run_recomb_repre(void) {
 /////////////////////////////////////////////////////////////////////
 
 int run_recomb(MD *md1, MD *md2, MD *MD1, MD *MD2) {
- 	const int OBSERVE = 1000;
+ 	const int OBSERVE = 10000000;
 	int i=-1;
+	int it=0;
 	int cg_f;
 	double runout=100000000000;
 	if (md1->flags->cg==0) cg_f=0;
@@ -83,6 +84,7 @@ int run_recomb(MD *md1, MD *md2, MD *MD1, MD *MD2) {
 				if (md1->flags->cg==2) md1->export_dump_rigid(md2);
 			}
 			if(md1->flags->gyration==1 || md2->flags->gyration==1) md1->gyration_out(md2);
+			it=0;
 		}
    		if(cg_f==0)	{
 			i=md1->verlet_recomb(md2);
@@ -99,7 +101,7 @@ int run_recomb(MD *md1, MD *md2, MD *MD1, MD *MD2) {
 				i=md1->verlet_rigid(md2);
 				md1->vars->time+=md1->rigid_dt;
 				md2->vars->time+=md1->rigid_dt;
-				md1->rigid_dt=sqrt(md1->crsq)*10;
+				//md1->rigid_dt=sqrt(md1->crsq)*10;
 			}
 		}
 
@@ -115,6 +117,7 @@ int run_recomb(MD *md1, MD *md2, MD *MD1, MD *MD2) {
 		}
 
 		if(md1->vars->time > runout) break;
+		it++;
 	}
 	return i;
 }

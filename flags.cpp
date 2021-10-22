@@ -18,7 +18,7 @@ FLAG::FLAG(void) {
 	force_ters=0;
 	force_sw=0;
 	force_coul=0;
-	intra_AMBER==0;
+	intra_AMBER=0;
 
 //	ion-gas interaction
 	force_lj=0;

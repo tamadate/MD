@@ -4,12 +4,12 @@
 class Observer {
 public:
 	double gas_kinetic_energy(Variables *vars);
-	double gas_total_kinetic_energy(Variables *vars, int num_gas);
+	double gas_total_kinetic_energy(Variables *vars);
 	double ion_kinetic_energy(Variables *vars);
 	double potential_energy(Variables *vars, std::vector<Pair> & pairs);
 	double gas_temperature(Variables *vars) ;
-	double gas_total_temperature(Variables *vars, int num_gas) {
-		return gas_total_kinetic_energy(vars, num_gas) / 1.5 * kb_real_inv;
+	double gas_total_temperature(Variables *vars) {
+		return gas_total_kinetic_energy(vars) / 1.5 * kb_real_inv/double(Nof_around_gas);
 	}
 	double ion_temperature(Variables *vars);
 	double pressure(Variables *vars, std::vector<Pair> &pairs, double Treal, double virial);

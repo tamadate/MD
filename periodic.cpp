@@ -20,189 +20,110 @@ adjust_periodic(double &dx, double &dy, double &dz) {
 	if (dz < -LH)dz += d_size;
 	if (dz > LH) dz -= d_size;
 }
-/************************periodec condition for out gas******************************/
-void
-MD::periodic_out(int dist, std::vector<int> &gas) {
-	Gas *gases = vars->gases.data();
-	int gos=gas.size();
-	double HL=d_size*0.5;
-	int flag, flagx, flagy, flagz;
-	double vMB, vxMB, vyMB, vzMB, vx, vy, vz, v2, v, mod_factor;
-	random_device seed;
-	default_random_engine engine(seed());
-	normal_distribution<> distgas(0.0, sqrt(kb*T/pp->mgas));
-	for (int k=0;k<gos;k++) {
-		int i=gas[k];
-		flag=flagx=flagy=flagz=0;
-		if (gases[i].qx < ion_r[0]-HL) gases[i].qx += d_size, flagx--, flag++;
-		if (gases[i].qy < ion_r[1]-HL) gases[i].qy += d_size, flagy--, flag++;
-		if (gases[i].qz < ion_r[2]-HL) gases[i].qz += d_size, flagz--, flag++;
-		if (gases[i].qx > ion_r[0]+HL) gases[i].qx -= d_size, flagx++, flag++;
-		if (gases[i].qy > ion_r[1]+HL) gases[i].qy -= d_size, flagy++, flag++;
-		if (gases[i].qz > ion_r[2]+HL) gases[i].qz -= d_size, flagz++, flag++;
-		if (i%pp->num_gas==0&&flag>0&&dist==1) {
-			if(number>vflux.size()*0.8) {making_trans_dist();}
-			if(number_N2>relative_N2s.size()) {making_intra_dist();}
-			vx=0,vy=0,vz=0;
-			for(int l = i; l < i+pp->num_gas; l++){
-				vx+=gases[l].px*gases[l].mass;
-				vy+=gases[l].py*gases[l].mass;
-				vz+=gases[l].pz*gases[l].mass;
-			}
-			vx = vx/pp->m_gas;
-			vy = vy/pp->m_gas;
-			vz = vz/pp->m_gas;
-			v2 = vx*vx+vy*vy+vz*vz;
-			v = sqrt(v2);
-			vMB = vflux[number]*1e-5;
-			mod_factor= vMB/v;
-			if(gastype==2){
-				gases[i].px = vx*mod_factor+(relative_N2s[number_N2].vx1-relative_N2s[number_N2].vx2)*0.5;
-				gases[i].py = vy*mod_factor+(relative_N2s[number_N2].vy1-relative_N2s[number_N2].vy2)*0.5;
-				gases[i].pz = vz*mod_factor+(relative_N2s[number_N2].vz1-relative_N2s[number_N2].vz2)*0.5;
-				gases[i+1].px = vx*mod_factor-(relative_N2s[number_N2].vx1-relative_N2s[number_N2].vx2)*0.5;
-				gases[i+1].py = vy*mod_factor-(relative_N2s[number_N2].vy1-relative_N2s[number_N2].vy2)*0.5;
-				gases[i+1].pz = vz*mod_factor-(relative_N2s[number_N2].vz1-relative_N2s[number_N2].vz2)*0.5;
-				gases[i+1].qx = gases[i].qx+relative_N2s[number_N2].x;
-				gases[i+1].qy = gases[i].qy+relative_N2s[number_N2].y;
-				gases[i+1].qz = gases[i].qz+relative_N2s[number_N2].z;
-				number++;
-				number_N2++;
-			}
-			else{
-				vx = gases[i].px;
-				vy = gases[i].py;
-				vz = gases[i].pz;
-				v2 = vx*vx+vy*vy+vz*vz;
-				v = sqrt(v2);
-				vMB = vflux[number]*1e-5;
-				mod_factor= vMB/v;
-				gases[i].px = vx * mod_factor;
-				gases[i].py = vy * mod_factor;
-				gases[i].pz = vz * mod_factor;
-				number++;
-			}
-		}
-		if (i%pp->num_gas==0&&flag>0&&dist==0) {
-			gases[i].px = distgas(engine) *1e-5;
-			gases[i].py = distgas(engine) *1e-5;
-			gases[i].pz = distgas(engine) *1e-5;
-		}
-	}
-}
+
 /************************periodec condition for in gas***************************/
 void
 MD::periodic(void) {
-	Gas *gases = vars->gases.data();
-	int gis=gas_in.size();
-	random_device seed;
-	default_random_engine engine(seed());
-	normal_distribution<> distgas(0.0, sqrt(kb*T/pp->mgas));
-	double HL=d_size*0.5;
-	int flag, flagx, flagy, flagz;
-	double vMB, vxMB, vyMB, vzMB, vx, vy, vz, v2, v, mod_factor;
-	for (int k=0;k<gis;k++) {
-		int i=gas_in[k];
-		flag=flagx=flagy=flagz=0;
-		if (gases[i].qx < ion_r[0]-HL) gases[i].qx += d_size, flagx--, flag++;
-		if (gases[i].qy < ion_r[1]-HL) gases[i].qy += d_size, flagy--, flag++;
-		if (gases[i].qz < ion_r[2]-HL) gases[i].qz += d_size, flagz--, flag++;
-		if (gases[i].qx > ion_r[0]+HL) gases[i].qx -= d_size, flagx++, flag++;
-		if (gases[i].qy > ion_r[1]+HL) gases[i].qy -= d_size, flagy++, flag++;
-		if (gases[i].qz > ion_r[2]+HL) gases[i].qz -= d_size, flagz++, flag++;
+	if(flags->semi_NVT_gasgas==0)	{
+		Gas *gases = vars->gases.data();
+		int gis=gas_in.size();
+		random_device seed;
+		default_random_engine engine(seed());
+		normal_distribution<> distgas(0.0, sqrt(kb*T/pp->mgas));
+		double HL=d_size*0.5;
+		int flag, flagx, flagy, flagz;
+		double vMB, vxMB, vyMB, vzMB, vx, vy, vz, v2, v, mod_factor;
+		for (int k=0;k<gis;k++) {
+			int i=gas_in[k];
+			flag=flagx=flagy=flagz=0;
+			if (gases[i].qx < ion_r[0]-HL) gases[i].qx += d_size, flagx--, flag++;
+			if (gases[i].qy < ion_r[1]-HL) gases[i].qy += d_size, flagy--, flag++;
+			if (gases[i].qz < ion_r[2]-HL) gases[i].qz += d_size, flagz--, flag++;
+			if (gases[i].qx > ion_r[0]+HL) gases[i].qx -= d_size, flagx++, flag++;
+			if (gases[i].qy > ion_r[1]+HL) gases[i].qy -= d_size, flagy++, flag++;
+			if (gases[i].qz > ion_r[2]+HL) gases[i].qz -= d_size, flagz++, flag++;
+		}
+	}
 
-
+	if(flags->semi_NVT_gasgas==1)	{
+		for (auto &a : gas_in)	boundary_scaling_gas_move(a);
+		analysis_ion();
+		for (auto &a : gas_in)	boundary_scaling_ion_move(a);
 	}
 }
 
 /************************periodec condition for in gas***************************/
+
 void
-MD::periodic_semi(void) {
+MD::boundary_scaling_gas_move(int i){
 	Gas *gases = vars->gases.data();
-	int gis=gas_in.size();
-	random_device seed;
-	default_random_engine engine(seed());
-	normal_distribution<> distgas(0.0, sqrt(kb*T/pp->mgas));
 	double HL=d_size*0.5;
 	int flag, flagx, flagy, flagz;
 	double vMB, vxMB, vyMB, vzMB, vx, vy, vz, v2, v, mod_factor;
+	random_device seed;
+	default_random_engine engine(seed());
+	normal_distribution<> distgas(0.0, sqrt(kb*T/pp->mgas));
 
-//Step 1
-	for (int k=0;k<gis;k++) {
-		int i=gas_in[k];
-		flag=flagx=flagy=flagz=0;
-		if (gases[i].qx < ion_r[0]-HL) gases[i].qx += d_size, flagx--, flag++;
-		if (gases[i].qy < ion_r[1]-HL) gases[i].qy += d_size, flagy--, flag++;
-		if (gases[i].qz < ion_r[2]-HL) gases[i].qz += d_size, flagz--, flag++;
-		if (gases[i].qx > ion_r[0]+HL) gases[i].qx -= d_size, flagx++, flag++;
-		if (gases[i].qy > ion_r[1]+HL) gases[i].qy -= d_size, flagy++, flag++;
-		if (gases[i].qz > ion_r[2]+HL) gases[i].qz -= d_size, flagz++, flag++;
-		if (i%pp->num_gas==0&&flag>0) {
-			if(number>vflux.size()*0.8) {making_trans_dist();}
-			if(number_N2>relative_N2s.size()) {making_intra_dist();}
-			vx=0,vy=0,vz=0;
-			for(int l = i; l < i+pp->num_gas; l++){
-				vx+=gases[l].px*gases[l].mass;
-				vy+=gases[l].py*gases[l].mass;
-				vz+=gases[l].pz*gases[l].mass;
-			}
-			vx = vx/pp->m_gas;
-			vy = vy/pp->m_gas;
-			vz = vz/pp->m_gas;
-			v2 = vx*vx+vy*vy+vz*vz;
-			v = sqrt(v2);
-			vMB = vflux[number]*1e-5;
-			mod_factor= vMB/v;
-			if(gastype==2){
-				gases[i].px = vx*mod_factor+(relative_N2s[number_N2].vx1-relative_N2s[number_N2].vx2)*0.5;
-				gases[i].py = vy*mod_factor+(relative_N2s[number_N2].vy1-relative_N2s[number_N2].vy2)*0.5;
-				gases[i].pz = vz*mod_factor+(relative_N2s[number_N2].vz1-relative_N2s[number_N2].vz2)*0.5;
-				gases[i+1].px = vx*mod_factor-(relative_N2s[number_N2].vx1-relative_N2s[number_N2].vx2)*0.5;
-				gases[i+1].py = vy*mod_factor-(relative_N2s[number_N2].vy1-relative_N2s[number_N2].vy2)*0.5;
-				gases[i+1].pz = vz*mod_factor-(relative_N2s[number_N2].vz1-relative_N2s[number_N2].vz2)*0.5;
-				gases[i+1].qx = gases[i].qx+relative_N2s[number_N2].x;
-				gases[i+1].qy = gases[i].qy+relative_N2s[number_N2].y;
-				gases[i+1].qz = gases[i].qz+relative_N2s[number_N2].z;
-				number++;
-				number_N2++;
-			}
-			else{
-				vx = gases[i].px;
-				vy = gases[i].py;
-				vz = gases[i].pz;
-				v2 = vx*vx+vy*vy+vz*vz;
-				v = sqrt(v2);
-				vMB = vflux[number]*1e-5;
-				mod_factor= vMB/v;
-				gases[i].px = vx * mod_factor;
-				gases[i].py = vy * mod_factor;
-				gases[i].pz = vz * mod_factor;
-				number++;
-			}
-		}
+	flag=flagx=flagy=flagz=0;
+	if (gases[i].qx < ion_r[0]-HL) gases[i].qx += d_size, flagx--, flag++;
+	if (gases[i].qy < ion_r[1]-HL) gases[i].qy += d_size, flagy--, flag++;
+	if (gases[i].qz < ion_r[2]-HL) gases[i].qz += d_size, flagz--, flag++;
+	if (gases[i].qx > ion_r[0]+HL) gases[i].qx -= d_size, flagx++, flag++;
+	if (gases[i].qy > ion_r[1]+HL) gases[i].qy -= d_size, flagy++, flag++;
+	if (gases[i].qz > ion_r[2]+HL) gases[i].qz -= d_size, flagz++, flag++;
+	if (flag>0) {
+		if(number>vflux.size()*0.8) {making_trans_dist();}
+		if(number_N2>relative_N2s.size()) {making_intra_dist();}
+        vx=gases[i].px*gases[i].mass;
+        vy=gases[i].py*gases[i].mass;
+        vz=gases[i].pz*gases[i].mass;
+		vx = vx/pp->m_gas;
+		vy = vy/pp->m_gas;
+		vz = vz/pp->m_gas;
+		v2 = vx*vx+vy*vy+vz*vz;
+		v = sqrt(v2);
+		vMB = vflux[number]*1e-5;
+		mod_factor= vMB/v;
+        vx = gases[i].px;
+        vy = gases[i].py;
+        vz = gases[i].pz;
+        v2 = vx*vx+vy*vy+vz*vz;
+        v = sqrt(v2);
+        vMB = vflux[number]*1e-5;
+        mod_factor= vMB/v;
+        gases[i].px = vx * mod_factor;
+        gases[i].py = vy * mod_factor;
+        gases[i].pz = vz * mod_factor;
+        number++;
 	}
-
-
-	analysis_ion();
-
-//Step 2
-	for (int k=0;k<gis;k++) {
-		int i=gas_in[k];
-		flag=flagx=flagy=flagz=0;
-		if (gases[i].qx < ion_r[0]-HL) gases[i].qx += d_size, flagx--, flag++;
-		if (gases[i].qy < ion_r[1]-HL) gases[i].qy += d_size, flagy--, flag++;
-		if (gases[i].qz < ion_r[2]-HL) gases[i].qz += d_size, flagz--, flag++;
-		if (gases[i].qx > ion_r[0]+HL) gases[i].qx -= d_size, flagx++, flag++;
-		if (gases[i].qy > ion_r[1]+HL) gases[i].qy -= d_size, flagy++, flag++;
-		if (gases[i].qz > ion_r[2]+HL) gases[i].qz -= d_size, flagz++, flag++;
-		if (i%pp->num_gas==0&&flag>0) {
-			gases[i].px = distgas(engine) *1e-5;
-			gases[i].py = distgas(engine) *1e-5;
-			gases[i].pz = distgas(engine) *1e-5;
-		}
-	}
-
 }
+
+
+void
+MD::boundary_scaling_ion_move(int i){
+	Gas *gases = vars->gases.data();
+	double HL=d_size*0.5;
+	int flag, flagx, flagy, flagz;
+	double vMB, vxMB, vyMB, vzMB, vx, vy, vz, v2, v, mod_factor;
+	random_device seed;
+	default_random_engine engine(seed());
+	normal_distribution<> distgas(0.0, sqrt(kb*T/pp->mgas));
+
+	flag=flagx=flagy=flagz=0;
+	if (gases[i].qx < ion_r[0]-HL) gases[i].qx += d_size, flagx--, flag++;
+	if (gases[i].qy < ion_r[1]-HL) gases[i].qy += d_size, flagy--, flag++;
+	if (gases[i].qz < ion_r[2]-HL) gases[i].qz += d_size, flagz--, flag++;
+	if (gases[i].qx > ion_r[0]+HL) gases[i].qx -= d_size, flagx++, flag++;
+	if (gases[i].qy > ion_r[1]+HL) gases[i].qy -= d_size, flagy++, flag++;
+	if (gases[i].qz > ion_r[2]+HL) gases[i].qz -= d_size, flagz++, flag++;
+	if (flag>0) {
+		gases[i].px = distgas(engine) *1e-5;
+		gases[i].py = distgas(engine) *1e-5;
+		gases[i].pz = distgas(engine) *1e-5;
+	}
+}
+
+
 
 /************************making weighted MB distribution*****************************/
 void

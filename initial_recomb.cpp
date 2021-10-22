@@ -57,7 +57,6 @@ MD::initial_recomb(MD *md2, MD *Md1, MD *Md2, Physical *pp12) {
 	normal_distribution<> dist1(0.0, sqrt(kb*T/Md1->pp->m));	
 	normal_distribution<> dist2(0.0, sqrt(kb*T/Md2->pp->m));
 	double v01[3],v02[3];
-	double f1[3],f2[3];
 	int flag=0;
 	double ve1=Md1->pp->z*Md2->pp->z*e*e/4.0/M_PI/e0/pp12->delta/pp12->delta*Md1->pp->D/kb/T;
 	double ve2=Md1->pp->z*Md2->pp->z*e*e/4.0/M_PI/e0/pp12->delta/pp12->delta*Md2->pp->D/kb/T;
@@ -78,7 +77,7 @@ MD::initial_recomb(MD *md2, MD *Md1, MD *Md2, Physical *pp12) {
 			pp12->th0=acos(vy/pp12->v0)/M_PI*180;
 			double thc=pp12->thc(pp12 -> v0*1e5);
 			n_kick++;
-			if(thc*10>pp12->th0) {
+			if(thc*100000>pp12->th0) {
 				flag++;
 			}
 		}

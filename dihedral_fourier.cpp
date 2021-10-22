@@ -11,14 +11,15 @@ MD::dihedral_fourier(void) {
 	Ion *ions = vars->ions.data();
 /*intra-molecular interaction (dihedral)*/
 	double vb1x,vb1y,vb1z,vb2x,vb2y,vb2z,vb3x,vb3y,vb3z,vb2xm,vb2ym,vb2zm;
-	double edihedral,f2[3],f4[3],f1[3],f3[3];
+	double edihedral,ff2[3],ff4[3],ff1[3],ff3[3];
 	double ax,ay,az,bx,by,bz,rasq,rbsq,rgsq,rg,rginv,ra2inv,rb2inv,rabinv;
 	double df,df1_,ddf1_,fg,hg,fga,hgb,gaa,gbb;
 	double dtfx,dtfy,dtfz,dtgx,dtgy,dtgz,dthx,dthy,dthz;
 	double c,s,p_,sx2,sy2,sz2, m;
 	Dihedral_type *dtypes = vars->dtypes.data();
 	for (auto &d : vars-> dihedrals) {
-		int i=d.atom1-1, j=d.atom2-1, k=d.atom3-1, l=d.atom3-1, type=d.type-1;
+		int i=d.atom1, j=d.atom2, k=d.atom3, l=d.atom4, type=d.type;
+   //     cout<<i<<" "<<j<<" "<<k<<" "<<l<<" "<<endl;
 		// 1st bond
 		vb1x = ions[i].qx - ions[j].qx;
 		vb1y = ions[i].qy - ions[j].qy;
@@ -57,7 +58,7 @@ MD::dihedral_fourier(void) {
 		int J= dtypes[type].multi;
 
 		if(J>0){
-			p=1.0;
+			p_=1.0;
 			ddf1_=df1_=0.0;
 			for (int loop=0; loop<dtypes[type].coeff2; loop++){        
 				ddf1_ = p_*c - df1_*s;
@@ -68,10 +69,15 @@ MD::dihedral_fourier(void) {
 			df1_ = df1_*dtypes[type].coeff4 - ddf1_*dtypes[type].coeff5;
 			df1_ *= -dtypes[type].coeff2;
 			p_ += 1.0;
+            if(dtypes[type].coeff2==0){
+                p_=1.0+dtypes[type].coeff4;
+                df1_=0.0;
+                cout<<"OK"<<endl;
+            }
 			df += (-dtypes[type].coeff1 * df1_);
 		}
 		if(J>1){
-			p=1.0;
+			p_=1.0;
 			ddf1_=df1_=0.0;
 			for (int loop=0; loop<dtypes[type].coeff7; loop++){        
 				ddf1_ = p_*c - df1_*s;
@@ -82,9 +88,15 @@ MD::dihedral_fourier(void) {
 			df1_ = df1_*dtypes[type].coeff9 - ddf1_*dtypes[type].coeff10;
 			df1_ *= -dtypes[type].coeff7;
 			p_ += 1.0;
+            if(dtypes[type].coeff7==0){
+                p_=1.0+dtypes[type].coeff4;
+                df1_=0.0;
+            }
 			df += (-dtypes[type].coeff6 * df1_);
 		}
 		if(J>2){
+            p_=1.0;
+            ddf1_=df1_=0.0;
 			for (int loop=0; loop<dtypes[type].coeff12; loop++){        
 				ddf1_ = p_*c - df1_*s;
 				df1_ = p_*s + df1_*c;
@@ -94,9 +106,13 @@ MD::dihedral_fourier(void) {
 			df1_ = df1_*dtypes[type].coeff14 - ddf1_*dtypes[type].coeff15;
 			df1_ *= -dtypes[type].coeff12;
 			p_ += 1.0;
+            if(dtypes[type].coeff12==0){
+                p_=1.0+dtypes[type].coeff4;
+                df1_=0.0;
+            }
 			df += (-dtypes[type].coeff11 * df1_);
 		}
-
+       // cout<<df<<endl;
 		fg = vb1x*vb2xm + vb1y*vb2ym + vb1z*vb2zm;
 		hg = vb3x*vb2xm + vb3y*vb2ym + vb3z*vb2zm;
 		fga = fg*ra2inv*rginv;
@@ -115,31 +131,31 @@ MD::dihedral_fourier(void) {
 		sx2 = df*dtgx;
 		sy2 = df*dtgy;
 		sz2 = df*dtgz;
-		f1[0] = df*dtfx;
-		f1[1] = df*dtfy;
-		f1[2] = df*dtfz;
-		f2[0] = sx2 - f1[0];
-		f2[1] = sy2 - f1[1];
-		f2[2] = sz2 - f1[2];
-		f4[0] = df*dthx;
-		f4[1] = df*dthy;
-		f4[2] = df*dthz;
-		f3[0] = -sx2 - f4[0];
-		f3[1] = -sy2 - f4[1];
-		f3[2] = -sz2 - f4[2];
+		ff1[0] = df*dtfx;
+		ff1[1] = df*dtfy;
+		ff1[2] = df*dtfz;
+		ff2[0] = sx2 - ff1[0];
+		ff2[1] = sy2 - ff1[1];
+		ff2[2] = sz2 - ff1[2];
+		ff4[0] = df*dthx;
+		ff4[1] = df*dthy;
+		ff4[2] = df*dthz;
+		ff3[0] = -sx2 - ff4[0];
+		ff3[1] = -sy2 - ff4[1];
+		ff3[2] = -sz2 - ff4[2];
 
-		ions[i].fx += f1[0];
-		ions[i].fy += f1[1];
-		ions[i].fz += f1[2];
-		ions[j].fx += f2[0];
-		ions[j].fy += f2[1];
-		ions[j].fz += f2[2];
-		ions[k].fx += f3[0];
-		ions[k].fy += f3[1];
-		ions[k].fz += f3[2];
-		ions[l].fx += f4[0];
-		ions[l].fy += f4[1];
-		ions[l].fz += f4[2];
+		ions[i].fx += ff1[0];
+		ions[i].fy += ff1[1];
+		ions[i].fz += ff1[2];
+		ions[j].fx += ff2[0];
+		ions[j].fy += ff2[1];
+		ions[j].fz += ff2[2];
+		ions[k].fx += ff3[0];
+		ions[k].fy += ff3[1];
+		ions[k].fz += ff3[2];
+		ions[l].fx += ff4[0];
+		ions[l].fy += ff4[1];
+		ions[l].fz += ff4[2];
 	
 	}
 }
