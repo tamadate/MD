@@ -32,8 +32,8 @@ $ ./a.out in1 con1 L N
 ## Step4 Analyze the output files
   
 # Authours
-* Tomoya Tamadate  
-* Kanazawa University  
+* Tomoya Tamadate, PhD  
+* University of Minnesota  
 * tamalab0109[at]gmail.com
 * https://www.researchgate.net/profile/Tomoya_Tamadate
 
